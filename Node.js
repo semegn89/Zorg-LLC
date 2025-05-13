@@ -8,3 +8,4 @@ app.post('/create-payment-intent', async (req, res) => {
   });
   res.send({ clientSecret: paymentIntent.client_secret });
 });
+<!-- test --> 
