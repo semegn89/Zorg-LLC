@@ -25,6 +25,10 @@ app.post('/create-checkout-session', async (req, res) => {
 
   res.json({ id: session.id });
 });
+const path = require('path');
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+}); 
 app.listen(3000, () => console.log('Server started on port 3000'));
 <!-- test --> 
