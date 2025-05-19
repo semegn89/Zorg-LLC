@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const stripe = require('stripe')('sk_live_...'); // 🔒 вставь свой СЕКРЕТНЫЙ ключ
+const stripe = require('stripe')(process.env.STRIPE_SECRET); 
 app.use(express.static('public'));
 app.use(express.json());
 
