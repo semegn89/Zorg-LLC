@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <!-- Мета-теги и заголовки, такие же или схожие с главной страницей -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zorg International FZCO | Auto Parts Store</title>
+    <meta name="description" content="Zorg International FZCO - Online store for high-quality auto parts with worldwide shipping">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS, FontAwesome и прочие стили, если нужно -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+      :root {
+        --primary: #2563EB;
+        --primary-dark: #1E40AF;
+        --primary-light: #EFF6FF;
+        --accent: #F59E0B;
+        --accent-dark: #D97706;
+        --light-bg: #F8FAFC;
+        --light: #FFFFFF;
+        --dark-text: #1F2937;
+        --gray-text: #6B7280;
+        --border: #E5E7EB;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --radius-sm: 0.5rem;
+        --radius-md: 1rem;
+        --radius-lg: 1.5rem;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* ВАЖНО: убрано overflow-x: hidden; 
+         чтобы боковая корзина не обрезалась за экраном */
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--light-bg);
+        color: var(--dark-text);
+        line-height: 1.6;
+        /* scroll-behavior: smooth; можно оставить, если нужно */
+      }
+
+      .rtl {
+        direction: rtl;
+      }
+
+      /* Preloader */
+      .preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--light);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+      }
+      .preloader.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .loader {
+        width: 50px;
+        height: 50px;
+        border: 5px solid var(--primary-light);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* Header */
+      .header {
+        background: var(--light);
+        padding: 1rem 5%;
+        position: fixed;
+        width: 100%;
+        z-index: 1000;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+      }
+      .header.scrolled {
+        padding: 0.5rem 5%;
+        box-shadow: var(--shadow-md);
+      }
+      .logo {
+        max-width: 200px;
+        height: auto;
+        display: block;
+      }
+      .nav-menu {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+      }
+      .nav-item {
+        text-decoration: none;
+        color: var(--dark-text);
+        font-weight: 500;
+        transition: var(--transition);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.95rem;
+        position: relative;
+      }
+      .nav-item:hover {
+        color: var(--primary);
+      }
+      .nav-item.active {
+        color: var(--primary);
+        font-weight: 600;
+      }
+      .burger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        z-index: 1001;
+        padding: 0.5rem;
+      }
+      .burger div {
+        width: 25px;
+        height: 3px;
+        background-color: var(--dark-text);
+        margin: 4px 0;
+        transition: var(--transition);
+      }
+      .burger.active div:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .burger.active div:nth-child(2) {
+        opacity: 0;
+      }
+      .burger.active div:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      /* Store Section */
+      .store {
+        padding: 6rem 5%;
+        background-color: var(--light-bg);
+      }
+      .section-title {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+        color: var(--dark-text);
+      }
+      .section-subtitle {
+        font-size: 1.25rem;
+        color: var(--gray-text);
+        margin-bottom: 3rem;
+      }
+
+      .store-filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+      .filter-group {
+        flex: 1;
+        min-width: 200px;
+      }
+      .filter-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--dark-text);
+      }
+      .filter-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background-color: var(--light);
+      }
+
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+      .product-card {
+        background: var(--light);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border: 1px solid var(--border);
+      }
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+      }
+      .product-img-container {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+      }
+      .product-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+      }
+      .product-card:hover .product-img {
+        transform: scale(1.05);
+      }
+      .product-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--primary);
+        color: var(--light);
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+      .product-content {
+        padding: 1.5rem;
+      }
+      .product-category {
+        display: block;
+        color: var(--gray-text);
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+      }
+      .product-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+        color: var(--dark-text);
+        font-weight: 600;
+      }
+      .product-description {
+        color: var(--gray-text);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .product-price {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1.25rem;
+      }
+      .product-old-price {
+        text-decoration: line-through;
+        color: var(--gray-text);
+        font-size: 0.9rem;
+        margin-right: 0.5rem;
+      }
+      .add-to-cart {
+        background: var(--primary);
+        color: var(--light);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .add-to-cart:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+      .cart-icon {
+        font-size: 0.9rem;
+      }
+
+      /* Cart Sidebar */
+      .cart-sidebar {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 100%;
+        max-width: 400px;
+        height: 100vh;
+        background: var(--light);
+        box-shadow: var(--shadow-lg);
+        z-index: 1001;
+        transition: var(--transition);
+        overflow-y: auto;
+        padding: 2rem;
+      }
+      .cart-sidebar.active {
+        right: 0;
+      }
+      .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .cart-title {
+        font-size: 1.5rem;
+        color: var(--dark-text);
+      }
+      .close-cart {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray-text);
+        transition: var(--transition);
+      }
+      .close-cart:hover {
+        color: var(--primary);
+      }
+      .cart-items {
+        margin-bottom: 2rem;
+      }
+      .cart-item {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .cart-item-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+      }
+      .cart-item-details {
+        flex: 1;
+      }
+      .cart-item-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      .cart-item-price {
+        color: var(--primary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      .cart-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .quantity-control {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+      }
+      .quantity-btn {
+        background: var(--primary-light);
+        border: none;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--primary);
+      }
+      .quantity-input {
+        width: 40px;
+        text-align: center;
+        border: none;
+        background: var(--light);
+      }
+      .remove-item {
+        background: none;
+        border: none;
+        color: var(--gray-text);
+        cursor: pointer;
+        transition: var(--transition);
+      }
+      .remove-item:hover {
+        color: #ef4444;
+      }
+
+      .cart-summary {
+        border-top: 1px solid var(--border);
+        padding-top: 1.5rem;
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      .summary-total {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--dark-text);
+      }
+      .checkout-btn {
+        width: 100%;
+        padding: 1rem;
+        background: var(--primary);
+        color: var(--light);
+        border: none;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      .checkout-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+      .cart-empty {
+        text-align: center;
+        padding: 2rem 0;
+        color: var(--gray-text);
+      }
+
+      /* Cart Button in Header */
+      .cart-btn {
+        position: relative;
+        background: none;
+        border: none;
+        color: var(--dark-text);
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+      .cart-btn:hover {
+        color: var(--primary);
+      }
+      .cart-count {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: var(--primary);
+        color: var(--light);
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Checkout Modal */
+      .checkout-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1002;
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition);
+      }
+      .checkout-modal.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal-content {
+        background: var(--light);
+        border-radius: var(--radius-md);
+        width: 90%;
+        max-width: 600px;
+        padding: 2rem;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray-text);
+      }
+      .modal-title {
+        margin-bottom: 1.5rem;
+        color: var(--dark-text);
+      }
+
+      /* Stripe Element styles */
+      .StripeElement {
+        box-sizing: border-box;
+        height: 40px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background-color: var(--light);
+        margin-bottom: 1rem;
+      }
+      .StripeElement--focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      .StripeElement--invalid {
+        border-color: #ef4444;
+      }
+      .StripeElement--webkit-autofill {
+        background-color: #fefde8 !important;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .products-grid {
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+        .cart-sidebar {
+          width: 90%;
+        }
+      }
+      @media (max-width: 576px) {
+        .products-grid {
+          grid-template-columns: 1fr;
+        }
+        .filter-group {
+          min-width: 100%;
+        }
+      }
+/* Модальное окно и оверлей */
+.checkout-modal {
+  position: fixed;
+  /* уже есть: top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1002;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+}
+
+/* Когда у .checkout-modal есть класс .active — окно показывается */
+.checkout-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Контейнер внутри модалки */
+.modal-content {
+  background: var(--light);       /* Светлый фон (или белый) */
+  border-radius: var(--radius-md);/* Скругление краёв */
+  width: 90%;                     /* Адаптивная ширина */
+  max-width: 500px;               /* Ограничение, чтобы окно не было слишком широким */
+  padding: 2rem;                  /* Внутренние отступы */
+  position: relative;
+  box-shadow: var(--shadow-lg);   /* Приятная тень */
+  overflow-y: auto;               /* Скролл, если контента много */
+  max-height: 90vh;               /* Чтобы окно не вылезало за экран по вертикали */
+}
+
+/* Кнопка закрытия (X) */
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--gray-text);
+  transition: var(--transition);
+}
+.close-modal:hover {
+  color: var(--primary);
+}
+
+/* Заголовок внутри модалки */
+.modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: center;       /* Можно выровнять по центру */
+  color: var(--dark-text);
+}
+
+/* Общий стиль для группы полей формы */
+.modal-content .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+/* Подпись (label) к полям */
+.modal-content .form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--dark-text);
+  font-size: 0.95rem;
+}
+
+/* Инпуты и select */
+.modal-content .form-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  transition: var(--transition);
+  width: 100%;
+}
+.modal-content .form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+/* Stripe-элемент (карта) */
+.StripeElement {
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0.75rem 1rem;    /* можно чуть меньше, чтобы влез в 40px */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--light);
+  margin-bottom: 1rem;
+}
+.StripeElement--focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+.StripeElement--invalid {
+  border-color: #ef4444;
+}
+
+/* Кнопка сабмита (Complete Payment) */
+.modal-content .form-submit {
+  background: var(--primary);
+  color: var(--light);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;            /* во всю ширину */
+  margin-top: 1rem;
+  transition: var(--transition);
+}
+.modal-content .form-submit:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+.modal-content .form-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Сообщения об успехе/ошибке */
+.form-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  display: none;
+}
+.form-message.success {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+.form-message.error {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FECACA;
+}
+      /* Уведомление при добавлении в корзину (если захотите) */
+      .cart-notification {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        background: var(--primary);
+        color: var(--light);
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: var(--transition);
+        z-index: 2000;
+      }
+      .cart-notification.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="changeLanguage('en')">EN</button>
+        <button class="lang-btn" onclick="changeLanguage('ar')">AR</button>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <img src="images/logo.png" alt="Zorg International Logo" class="logo" loading="lazy">
+        <nav class="nav-menu">
+            <!-- Ссылки возвращают пользователя на index.html с соответствующими якорями -->
+            <a href="index.html" class="nav-item" data-i18n="menu.home">Home</a>
+            <a href="index.html#about" class="nav-item" data-i18n="menu.about">About</a>
+            <a href="index.html#services" class="nav-item" data-i18n="menu.services">Services</a>
+            <!-- Текущая страница активна -->
+            <a href="store.html" class="nav-item active" data-i18n="menu.store">Store</a>
+            <a href="index.html#contact" class="nav-item" data-i18n="menu.contact">Contact</a>
+            <button class="cart-btn">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </button>
+        </nav>
+        <div class="burger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </header>
+
+    <!-- Store Section -->
+    <section class="store">
+        <h2 class="section-title" data-i18n="store.title">Auto Parts Store</h2>
+        <p class="section-subtitle" data-i18n="store.subtitle">High-quality parts for all major vehicle brands</p>
+        
+        <div class="store-filters">
+            <div class="filter-group">
+                <label for="category" class="filter-label" data-i18n="store.category">Category</label>
+                <select id="category" class="filter-select">
+                    <option value="all" data-i18n="store.all_categories">All Categories</option>
+                    <option value="engine" data-i18n="store.engine">Engine Parts</option>
+                    <option value="brakes" data-i18n="store.brakes">Brake System</option>
+                    <option value="suspension" data-i18n="store.suspension">Suspension</option>
+                    <option value="electrical" data-i18n="store.electrical">Electrical</option>
+                    <option value="exhaust" data-i18n="store.exhaust">Exhaust System</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="brand" class="filter-label" data-i18n="store.brand">Vehicle Brand</label>
+                <select id="brand" class="filter-select">
+                    <option value="all" data-i18n="store.all_brands">All Brands</option>
+                    <option value="toyota" data-i18n="store.toyota">Toyota</option>
+                    <option value="nissan" data-i18n="store.nissan">Nissan</option>
+                    <option value="bmw" data-i18n="store.bmw">BMW</option>
+                    <option value="mercedes" data-i18n="store.mercedes">Mercedes</option>
+                    <option value="audi" data-i18n="store.audi">Audi</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="sort" class="filter-label" data-i18n="store.sort">Sort By</label>
+                <select id="sort" class="filter-select">
+                    <option value="popular" data-i18n="store.popular">Most Popular</option>
+                    <option value="newest" data-i18n="store.newest">Newest</option>
+                    <option value="price-low" data-i18n="store.price_low">Price: Low to High</option>
+                    <option value="price-high" data-i18n="store.price_high">Price: High to Low</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="products-grid" id="productsGrid">
+            <!-- Продукты будут загружены динамически скриптом -->
+        </div>
+    </section>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h3 class="cart-title" data-i18n="store.your_cart">Your Cart</h3>
+            <button class="close-cart"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="cart-items" id="cartItems">
+            <!-- Товары в корзине -->
+            <div class="cart-empty" data-i18n="store.cart_empty">Your cart is empty</div>
+        </div>
+        
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span data-i18n="store.subtotal">Subtotal</span>
+                <span class="cart-subtotal">$0.00</span>
+            </div>
+            <div class="summary-row">
+                <span data-i18n="store.shipping">Shipping</span>
+                <span class="cart-shipping" data-i18n="store.calculated">Calculated at checkout</span>
+            </div>
+            <div class="summary-row">
+                <span data-i18n="store.tax">Tax</span>
+                <span class="cart-tax">$0.00</span>
+            </div>
+            <div class="summary-row summary-total">
+                <span data-i18n="store.total">Total</span>
+                <span class="cart-total">$0.00</span>
+            </div>
+            
+            <button class="checkout-btn" id="checkoutBtn" data-i18n="store.checkout">
+                <span>Proceed to Checkout</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h3 class="modal-title" data-i18n="store.checkout">Checkout</h3>
+            
+            <form id="checkoutForm">
+                <div class="form-group">
+                    <label for="checkoutName" class="form-label" data-i18n="form.name">Full Name</label>
+                    <input type="text" id="checkoutName" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="checkoutEmail" class="form-label" data-i18n="form.email">Email Address</label>
+                    <input type="email" id="checkoutEmail" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="checkoutAddress" class="form-label" data-i18n="store.address">Shipping Address</label>
+                    <input type="text" id="checkoutAddress" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="checkoutCity" class="form-label" data-i18n="store.city">City</label>
+                    <input type="text" id="checkoutCity" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="checkoutCountry" class="form-label" data-i18n="store.country">Country</label>
+                    <select id="checkoutCountry" class="form-input" required>
+                        <option value="" data-i18n="store.select_country">Select Country</option>
+                        <option value="AE" data-i18n="store.uae">United Arab Emirates</option>
+                        <option value="SA" data-i18n="store.saudi">Saudi Arabia</option>
+                        <option value="KW" data-i18n="store.kuwait">Kuwait</option>
+                        <option value="QA" data-i18n="store.qatar">Qatar</option>
+                        <option value="OM" data-i18n="store.oman">Oman</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardElement" class="form-label" data-i18n="store.payment">Payment Details</label>
+                    <div id="cardElement" class="form-input"></div>
+                    <div id="cardErrors" role="alert" style="color: #ef4444; font-size: 0.9rem; margin-top: 0.5rem;"></div>
+                </div>
+                
+                <button type="submit" class="form-submit" id="submitPayment" data-i18n="store.complete_payment">
+                    <span>Complete Payment</span>
+                    <i class="fas fa-lock"></i>
+                </button>
+                
+                <div class="form-message success" id="paymentSuccess" style="display: none;" data-i18n="store.payment_success">
+                    Payment successful! Your order has been placed. A confirmation has been sent to your email.
+                </div>
+                
+                <div class="form-message error" id="paymentError" style="display: none;" data-i18n="store.payment_error">
+                    There was an error processing your payment. Please try again.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer (можно взять тот же, что и на главной, или укоротить) -->
+    <footer class="footer" style="margin-top: 4rem;">
+      <div style="text-align: center; padding: 2rem; color: #fff; background: #1F2937;">
+        <p>Zorg International FZCO. All Rights Reserved. © 2023</p>
+      </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" style="bottom: 4rem;">
+      <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      // Preloader
+      window.addEventListener('load', function() {
+        const preloader = document.querySelector('.preloader');
+        preloader.classList.add('fade-out');
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 500);
+      });
+
+      // Burger menu logic (если нужно)
+      const burger = document.querySelector('.burger');
+      const navMenu = document.querySelector('.nav-menu');
+      burger.addEventListener('click', function() {
+        burger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+      });
+
+      // Store products
+      const products = [
+        {
+          id: 1,
+          name: "Engine Control Module",
+          description: "OEM quality engine control module compatible with multiple vehicle models.",
+          category: "engine",
+          brand: "toyota",
+          price: 249.99,
+          oldPrice: 299.99,
+          image: "images/products/engine-module.jpg",
+          badge: "Bestseller"
+        },
+        {
+          id: 2,
+          name: "Brake Pad Set",
+          description: "High-performance brake pads for improved stopping power and durability.",
+          category: "brakes",
+          brand: "bmw",
+          price: 89.99,
+          oldPrice: 119.99,
+          image: "images/products/brake-pads.jpg",
+          badge: "Sale"
+        },
+        {
+          id: 3,
+          name: "Shock Absorber",
+          description: "Premium shock absorbers for smooth ride and better handling.",
+          category: "suspension",
+          brand: "nissan",
+          price: 129.99,
+          image: "images/products/shock-absorber.jpg"
+        },
+        {
+          id: 4,
+          name: "Alternator",
+          description: "High-output alternator with improved charging capacity.",
+          category: "electrical",
+          brand: "mercedes",
+          price: 199.99,
+          oldPrice: 249.99,
+          image: "images/products/alternator.jpg",
+          badge: "Sale"
+        },
+        {
+          id: 5,
+          name: "Catalytic Converter",
+          description: "Direct-fit catalytic converter meeting all emissions standards.",
+          category: "exhaust",
+          brand: "audi",
+          price: 349.99,
+          image: "images/products/catalytic-converter.jpg"
+        },
+        {
+          id: 6,
+          name: "Fuel Pump",
+          description: "High-pressure fuel pump for efficient fuel delivery.",
+          category: "engine",
+          brand: "toyota",
+          price: 129.99,
+          oldPrice: 159.99,
+          image: "images/products/fuel-pump.jpg",
+          badge: "Bestseller"
+        },
+        {
+          id: 7,
+          name: "Starter Motor",
+          description: "Durable starter motor with high torque for reliable engine starts.",
+          category: "electrical",
+          brand: "nissan",
+          price: 149.99,
+          image: "images/products/starter-motor.jpg"
+        },
+        {
+          id: 8,
+          name: "Control Arm",
+          description: "Heavy-duty control arm for improved suspension performance.",
+          category: "suspension",
+          brand: "bmw",
+          price: 179.99,
+          image: "images/products/control-arm.jpg"
+        }, 
+        {
+          id: 9,
+          name: "Brake Rotor",
+          description: "High-performance brake rotor for better heat dissipation.",
+          category: "brakes",
+          brand: "mercedes",
+          price: 99.99,
+          oldPrice: 129.99,
+          image: "images/products/brake-rotor.jpg",
+          badge: "Sale"
+        },
+        {
+          id: 10,
+          name: "Exhaust Muffler",
+          description: "Performance exhaust muffler for enhanced sound and flow.",
+          category: "exhaust",
+          brand: "audi",
+          price: 199.99,
+          image: "images/products/exhaust-muffler.jpg"
+        },
+        { id: 11,
+          name: "Ignition Coil",
+          description: "High-performance ignition coil for better fuel efficiency.",
+          category: "engine",
+          brand: "toyota",
+          price: 49.99,
+          image: "images/products/ignition-coil.jpg"
+        },
+        {
+          id: 12,
+          name: "Power Steering Pump",
+          description: "Durable power steering pump for smooth steering operation.",
+          category: "electrical",
+          brand: "nissan",
+          price: 89.99,
+          oldPrice: 109.99,
+          image: "images/products/power-steering-pump.jpg",
+          badge: "Bestseller"
+        },
+        {
+          id: 13,
+          name: "Timing Belt Kit",
+          description: "Complete timing belt kit for reliable engine performance.",
+          category: "engine",
+          brand: "bmw",
+          price: 199.99,
+          image: "images/products/timing-belt-kit.jpg"
+        },
+        {
+          id: 14,
+          name: "Oil Filter",
+          description: "High-efficiency oil filter for better engine protection.",
+          category: "engine",
+          brand: "mercedes",
+          price: 29.99,
+          image: "images/products/oil-filter.jpg"
+        },
+        {
+          id: 15,
+          name: "Air Filter",
+          description: "Premium air filter for improved engine performance.",
+          category: "engine",
+          brand: "audi",
+          price: 39.99,
+          image: "images/products/air-filter.jpg"
+        },
+        {
+          id: 16,
+          name: "Windshield Wiper Blades",
+          description: "High-quality wiper blades for clear visibility in all weather.",
+          category: "electrical",
+          brand: "toyota",
+          price: 19.99,
+          image: "images/products/windshield-wipers.jpg"
+        },
+        {
+          id: 17,
+          name: "Battery",
+          description: "High-capacity battery for reliable starting power.",
+          category: "electrical",
+          brand: "nissan",
+          price: 129.99,
+          oldPrice: 159.99,
+          image: "images/products/battery.jpg",
+          badge: "Sale"
+        },
+        {
+          id: 18,
+          name: "Transmission Fluid",
+          description: "High-performance transmission fluid for smooth shifting.",
+          category: "engine",
+          brand: "bmw",
+          price: 29.99,
+          image: "images/products/transmission-fluid.jpg"
+        },
+        {
+          id: 19,
+          name: "Brake Fluid",
+          description: "High-temperature brake fluid for optimal braking performance.",
+          category: "brakes",
+          brand: "mercedes",
+          price: 14.99,
+          image: "images/products/brake-fluid.jpg"
+        },
+        {
+          id: 20,
+          name: "Coolant",
+          description: "High-performance coolant for engine temperature regulation.",
+          category: "engine",
+          brand: "audi",
+          price: 24.99,
+          image: "images/products/coolant.jpg"
+        },
+        {
+          id: 21,
+          name: "Tire Pressure Monitor Sensor",
+          description: "TPMS sensor for accurate tire pressure monitoring.",
+          category: "electrical",
+          brand: "toyota",
+          price: 49.99,
+          image: "images/products/tire-pressure-sensor.jpg"
+        },
+        {
+          id: 22,
+          name: "Fuel Injector",
+          description: "High-performance fuel injector for better fuel atomization.",
+          category: "engine",
+          brand: "nissan",
+          price: 79.99,
+          image: "images/products/fuel-injector.jpg"
+        },
+        {
+          id: 23,
+          name: "Radiator",
+          description: "High-efficiency radiator for optimal engine cooling.",
+          category: "engine",
+          brand: "bmw",
+          price: 199.99,
+          oldPrice: 249.99,
+          image: "images/products/radiator.jpg",
+          badge: "Sale"
+        },
+        {
+          id: 24,
+          name: "Clutch Kit",
+          description: "Complete clutch kit for smooth gear shifting.",
+          category: "engine",
+          brand: "mercedes",
+          price: 299.99,
+          image: "images/products/clutch-kit.jpg"
+        
+        },
+        {
+          id: 25,
+          name: "Wheel Bearing",
+          description: "High-quality wheel bearing for smooth wheel rotation.",
+          category: "suspension",
+          brand: "audi",
+          price: 59.99,
+          image: "images/products/wheel-bearing.jpg"
+        },
+        {
+          id: 26,
+          name: "Suspension Strut",
+          description: "Durable suspension strut for improved ride quality.",
+          category: "suspension",
+          brand: "toyota",
+          price: 129.99,
+          image: "images/products/suspension-strut.jpg"
+        },
+        {
+          id: 27,
+          name: "Headlight Assembly",
+          description: "High-performance headlight assembly for better visibility.",
+          category: "electrical",
+          brand: "nissan",
+          price: 89.99,
+          image: "images/products/headlight-assembly.jpg"
+        },
+        {
+          id: 28,
+          name: "Tail Light Assembly",
+          description: "Durable tail light assembly for enhanced safety.",
+          category: "electrical",
+          brand: "bmw",
+          price: 79.99,
+          image: "images/products/tail-light-assembly.jpg"
+        },
+        {
+          id: 29,
+          name: "Spark Plug Set",
+          description: "High-performance spark plugs for better ignition.",
+          category: "engine",
+          brand: "mercedes",
+          price: 39.99,
+          image: "images/products/spark-plug-set.jpg"
+        },
+        {
+          id: 30,
+          name: "Oil Pump",
+          description: "High-capacity oil pump for optimal engine lubrication.",
+          category: "engine",
+          brand: "audi",
+          price: 149.99,
+          oldPrice: 179.99,
+          image: "images/products/oil-pump.jpg"
+        }
+      ];
+
+      let cart = [];
+      const productsGrid = document.getElementById('productsGrid');
+      const cartItems = document.getElementById('cartItems');
+      const cartSidebar = document.querySelector('.cart-sidebar');
+      const closeCartBtn = document.querySelector('.close-cart');
+      const cartBtn = document.querySelector('.cart-btn');
+      const cartCount = document.querySelector('.cart-count');
+      const cartSubtotal = document.querySelector('.cart-subtotal');
+      const cartTax = document.querySelector('.cart-tax');
+      const cartTotal = document.querySelector('.cart-total');
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      const checkoutModal = document.getElementById('checkoutModal');
+      const closeModalBtn = document.querySelector('.close-modal');
+      const checkoutForm = document.getElementById('checkoutForm');
+      const paymentSuccess = document.getElementById('paymentSuccess');
+      const paymentError = document.getElementById('paymentError');
+
+      function initStore() {
+        renderProducts(products);
+        updateCart();
+        document.getElementById('category').addEventListener('change', filterProducts);
+        document.getElementById('brand').addEventListener('change', filterProducts);
+        document.getElementById('sort').addEventListener('change', filterProducts);
+        cartBtn.addEventListener('click', toggleCart);
+        closeCartBtn.addEventListener('click', toggleCart);
+        checkoutBtn.addEventListener('click', openCheckoutModal);
+        closeModalBtn.addEventListener('click', closeCheckoutModal);
+        setupStripe();
+      }
+
+      function renderProducts(items) {
+        productsGrid.innerHTML = '';
+        if (!items.length) {
+          productsGrid.innerHTML = '<p class="no-products" data-i18n="store.no_products">No products match your filters.</p>';
+          return;
+        }
+        items.forEach(product => {
+          const card = document.createElement('div');
+          card.classList.add('product-card');
+          card.innerHTML = `
+            <div class="product-img-container">
+              <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
+              ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
+            </div>
+            <div class="product-content">
+              <span class="product-category">${product.category}</span>
+              <h3 class="product-title">${product.name}</h3>
+              <p class="product-description">${product.description}</p>
+              <div class="product-footer">
+                <div class="product-price">
+                  ${product.oldPrice ? `<span class="product-old-price">$${product.oldPrice.toFixed(2)}</span>` : ''}
+                  $${product.price.toFixed(2)}
+                </div>
+                <button class="add-to-cart" data-id="${product.id}">
+                  <i class="fas fa-shopping-cart cart-icon"></i>
+                  <span data-i18n="store.add_to_cart">Add to Cart</span>
+                </button>
+              </div>
+            </div>
+          `;
+          productsGrid.appendChild(card);
+        });
+        // Повесить обработчик на кнопки Add to Cart
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+          btn.addEventListener('click', addToCart);
+        });
+      }
+
+      function filterProducts() {
+        const category = document.getElementById('category').value;
+        const brand = document.getElementById('brand').value;
+        const sort = document.getElementById('sort').value;
+        let filtered = [...products];
+
+        if (category !== 'all') {
+          filtered = filtered.filter(p => p.category === category);
+        }
+        if (brand !== 'all') {
+          filtered = filtered.filter(p => p.brand === brand);
+        }
+        switch (sort) {
+          case 'newest':
+            filtered.sort((a, b) => b.id - a.id);
+            break;
+          case 'price-low':
+            filtered.sort((a, b) => a.price - b.price);
+            break;
+          case 'price-high':
+            filtered.sort((a, b) => b.price - a.price);
+            break;
+          default:
+            // "Most Popular" — логика любая, по умолчанию оставим как есть
+            filtered.sort((a, b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0));
+        }
+        renderProducts(filtered);
+      }
+
+      function addToCart(e) {
+        const id = parseInt(e.currentTarget.dataset.id);
+        const product = products.find(p => p.id === id);
+        if (!product) return;
+        const itemInCart = cart.find(item => item.id === id);
+        if (itemInCart) {
+          itemInCart.quantity++;
+        } else {
+          cart.push({...product, quantity: 1});
+        }
+        updateCart();
+        showCartNotification();
+      }
+
+      function updateCart() {
+        cartCount.textContent = cart.reduce((acc, item) => acc + item.quantity, 0);
+        if (!cart.length) {
+          cartItems.innerHTML = '<div class="cart-empty" data-i18n="store.cart_empty">Your cart is empty</div>';
+        } else {
+          cartItems.innerHTML = '';
+          cart.forEach(item => {
+            const div = document.createElement('div');
+            div.classList.add('cart-item');
+            div.innerHTML = `
+              <img src="${item.image}" alt="${item.name}" class="cart-item-img">
+              <div class="cart-item-details">
+                <h4 class="cart-item-title">${item.name}</h4>
+                <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+                <div class="cart-item-actions">
+                  <div class="quantity-control">
+                    <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                    <input type="text" class="quantity-input" value="${item.quantity}" readonly>
+                    <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                  </div>
+                  <button class="remove-item" data-id="${item.id}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            `;
+            cartItems.appendChild(div);
+          });
+          document.querySelectorAll('.quantity-btn.minus').forEach(btn => btn.addEventListener('click', decreaseQuantity));
+          document.querySelectorAll('.quantity-btn.plus').forEach(btn => btn.addEventListener('click', increaseQuantity));
+          document.querySelectorAll('.remove-item').forEach(btn => btn.addEventListener('click', removeItem));
+        }
+        const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        const tax = subtotal * 0.05; // 5% tax условно
+        const total = subtotal + tax;
+        cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+        cartTax.textContent = `$${tax.toFixed(2)}`;
+        cartTotal.textContent = `$${total.toFixed(2)}`;
+      }
+
+      function decreaseQuantity(e) {
+        const id = parseInt(e.currentTarget.dataset.id);
+        const item = cart.find(i => i.id === id);
+        if (item && item.quantity > 1) {
+          item.quantity--;
+          updateCart();
+        }
+      }
+      function increaseQuantity(e) {
+        const id = parseInt(e.currentTarget.dataset.id);
+        const item = cart.find(i => i.id === id);
+        if (item) {
+          item.quantity++;
+          updateCart();
+        }
+      }
+      function removeItem(e) {
+        const id = parseInt(e.currentTarget.dataset.id);
+        cart = cart.filter(i => i.id !== id);
+        updateCart();
+      }
+
+      function toggleCart() {
+        cartSidebar.classList.toggle('active');
+      }
+
+      function showCartNotification() {
+        const notif = document.createElement('div');
+        notif.className = 'cart-notification';
+        notif.innerHTML = `
+          <i class="fas fa-check-circle"></i>
+          <span data-i18n="store.item_added">Item added to cart</span>
+        `;
+        document.body.appendChild(notif);
+        setTimeout(() => {
+          notif.classList.add('show');
+        }, 10);
+        setTimeout(() => {
+          notif.classList.remove('show');
+          setTimeout(() => {
+            document.body.removeChild(notif);
+          }, 300);
+        }, 3000);
+      }
+
+      function openCheckoutModal() {
+        if (!cart.length) return; // пустая корзина - не открываем
+        checkoutModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeCheckoutModal() {
+        checkoutModal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      // Stripe
+      let stripe;
+      function setupStripe() {
+        stripe = Stripe('pk_live_51QoRUDEIh87EqHzX3MoIfTUVV5qhZlqKxT50R2w9y99qtMJFNoLGVelZXWJy75PORAc8VPgWLVMQekvTskRzm6IJ00BQTE8c8q');
+        
+        checkoutForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitBtn = document.getElementById('submitPayment');
+          const originalText = submitBtn.innerHTML;
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
+          submitBtn.disabled = true;
+          paymentError.style.display = 'none';
+
+          try {
+            const response = await fetch('/create-checkout-session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                items: cart.map(item => ({
+                  name: item.name,
+                  price: item.price,
+                  currency: 'usd', // или динамически на основе выбора, если хочешь
+                  quantity: item.quantity
+                }))
+              })
+            });
+
+            const session = await response.json();
+            const result = await stripe.redirectToCheckout({ sessionId: session.id });
+
+            if (result.error) {
+              document.getElementById('cardErrors').textContent = result.error.message;
+              paymentError.style.display = 'block';
+            }
+          } catch (err) {
+            console.error(err);
+            document.getElementById('cardErrors').textContent = 'Error creating checkout session.';
+            paymentError.style.display = 'block';
+          } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+          }
+        });
+      }
+
+      // i18n (упрощенно, если нужно)
+      function changeLanguage(lng) {
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        // ... реализация переключения языка ...
+      }
+
+      document.addEventListener('DOMContentLoaded', initStore);
+    </script>
+</body>
+</html>
+<!-- test --> 
