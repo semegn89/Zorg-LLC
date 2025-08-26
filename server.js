@@ -7,7 +7,12 @@ const path = require('path');
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://zorg-llc.vercel.app', 'https://www.zorg-international.com']
+    ? [
+        'https://zorg-kk4mzg0rd-alexs-projects-ec8de01e.vercel.app',
+        'https://www.zorg-international.com',
+        'https://zorg-international.com',
+        'https://your-custom-domain.com' // Замените на ваш домен
+      ]
     : 'http://localhost:3000',
   methods: ['GET', 'POST'],
   credentials: true
