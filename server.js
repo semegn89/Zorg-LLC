@@ -11,7 +11,9 @@ app.use(cors({
         'https://zorg-kk4mzg0rd-alexs-projects-ec8de01e.vercel.app',
         'https://www.zorg-international.com',
         'https://zorg-international.com',
-        'https://your-custom-domain.com' // Замените на ваш домен
+        'https://zorgparts.com',
+        'https://www.zorgparts.com',
+        'https://zorg-llc.vercel.app'
       ]
     : 'http://localhost:3000',
   methods: ['GET', 'POST'],
