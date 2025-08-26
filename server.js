@@ -19,7 +19,10 @@ app.use(cors({
   methods: ['GET', 'POST'],
   credentials: true
 }));
+
+// Serve static files
 app.use(express.static('public'));
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 app.use(express.json());
 
 // Serve static files
