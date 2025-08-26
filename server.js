@@ -22,7 +22,7 @@ app.use(cors({
 
 // Serve static files
 app.use(express.static('public'));
-app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
 
 // Serve static files
